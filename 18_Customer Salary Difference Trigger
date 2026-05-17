@@ -1,0 +1,69 @@
+18   
+Trigger: Create a row level trigger for the CUSTOMERS table that would fire INSERT or UPDATE or DELETE operations performed on the CUSTOMERS table. This trigger will display the salary difference between the old values and new values. 
+
+
+
+
+==================================================================================================================================================================================================
+
+
+CREATE TABLE CUSTOMERS (
+    ID NUMBER PRIMARY KEY,
+    NAME VARCHAR2(50),
+    AGE NUMBER,
+    ADDRESS VARCHAR2(100),
+    SALARY NUMBER(10,2)
+);
+
+
+
+INSERT INTO CUSTOMERS VALUES
+(1,'Rahul',22,'Pune',25000);
+
+INSERT INTO CUSTOMERS VALUES
+(2,'Sneha',24,'Mumbai',30000);
+
+
+
+CREATE OR REPLACE TRIGGER salary_difference_trigger
+BEFORE INSERT OR UPDATE OR DELETE
+ON CUSTOMERS
+FOR EACH ROW
+
+BEGIN
+
+    IF INSERTING THEN
+
+        DBMS_OUTPUT.PUT_LINE('New Salary: ' || :NEW.SALARY);
+
+    ELSIF UPDATING THEN
+
+        DBMS_OUTPUT.PUT_LINE('Old Salary: ' || :OLD.SALARY);
+        DBMS_OUTPUT.PUT_LINE('New Salary: ' || :NEW.SALARY);
+        DBMS_OUTPUT.PUT_LINE('Salary Difference: ' ||
+                             (:NEW.SALARY - :OLD.SALARY));
+
+    ELSIF DELETING THEN
+
+        DBMS_OUTPUT.PUT_LINE('Deleted Salary: ' || :OLD.SALARY);
+
+    END IF;
+
+END;
+/
+
+
+
+UPDATE CUSTOMERS
+SET SALARY = 35000
+WHERE ID = 1;
+
+
+
+INSERT INTO CUSTOMERS
+VALUES (3,'Amit',25,'Nagpur',28000);
+
+
+
+DELETE FROM CUSTOMERS
+WHERE ID = 2;

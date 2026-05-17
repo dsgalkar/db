@@ -1,0 +1,92 @@
+17  
+Write a Row Level Before and After Trigger on Library table. The System should keep track of the records that are being updated or deleted. The old value of updated or deleted records should be added in Library_Audit table.  
+
+
+
+
+==================================================================================================================================================================================================
+
+
+CREATE TABLE Library (
+    Book_ID NUMBER PRIMARY KEY,
+    Book_Name VARCHAR2(50),
+    Author VARCHAR2(50),
+    Price NUMBER(10,2)
+);
+
+
+CREATE TABLE Library_Audit (
+    Book_ID NUMBER,
+    Book_Name VARCHAR2(50),
+    Author VARCHAR2(50),
+    Price NUMBER(10,2),
+    Operation VARCHAR2(20),
+    Action_Date DATE
+);
+
+
+
+CREATE OR REPLACE TRIGGER Library_Before_Trigger
+BEFORE UPDATE OR DELETE
+ON Library
+FOR EACH ROW
+
+BEGIN
+
+    INSERT INTO Library_Audit
+    VALUES(
+        :OLD.Book_ID,
+        :OLD.Book_Name,
+        :OLD.Author,
+        :OLD.Price,
+        'BEFORE OPERATION',
+        SYSDATE
+    );
+
+END;
+/
+
+
+
+CREATE OR REPLACE TRIGGER Library_After_Trigger
+AFTER UPDATE OR DELETE
+ON Library
+FOR EACH ROW
+
+BEGIN
+
+    INSERT INTO Library_Audit
+    VALUES(
+        :OLD.Book_ID,
+        :OLD.Book_Name,
+        :OLD.Author,
+        :OLD.Price,
+        'AFTER OPERATION',
+        SYSDATE
+    );
+
+END;
+/
+
+
+
+INSERT INTO Library VALUES
+(101,'DBMS','Korth',500);
+
+INSERT INTO Library VALUES
+(102,'Java','James Gosling',650);
+
+
+
+
+UPDATE Library
+SET Price = 700
+WHERE Book_ID = 101;
+
+
+
+DELETE FROM Library
+WHERE Book_ID = 102;
+
+
+SELECT * FROM Library_Audit;

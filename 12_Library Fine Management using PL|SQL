@@ -1,0 +1,89 @@
+12 
+Write a Unnamed PL/SQL of code for the following requirements:- Schema:   
+	Borrower (Rollin, Name, DateofIssue, NameofBook, Status)  
+	Fine (Roll_no,Date,Amt)  
+	Accept roll_no & name of book from user.  
+Check the number of days (from date of issue).  
+	1. If days are between 15 to 30 then fine amounts will be Rs 5 per day.  
+	2. If no. of days>30, per day fine will be Rs 50 per day & for days less than 30, Rs. 5 per day.  
+	3. After submitting the book, status will change from I to R.  
+	4. If condition of fine is true, then details will be stored into fine table.  
+
+
+
+
+==================================================================================================================================================================================================
+
+
+CREATE TABLE Borrower (
+    Rollin NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    DateofIssue DATE,
+    NameofBook VARCHAR2(50),
+    Status CHAR(1)
+);
+
+CREATE TABLE Fine (
+    Roll_no NUMBER,
+    Date1 DATE,
+    Amt NUMBER(10,2)
+);
+
+
+
+DECLARE
+    r_no Borrower.Rollin%TYPE;
+    b_name Borrower.NameofBook%TYPE;
+    issue_date DATE;
+    no_of_days NUMBER;
+    fine_amt NUMBER := 0;
+
+BEGIN
+
+    r_no := &roll_no;
+    b_name := '&book_name';
+
+    SELECT DateofIssue
+    INTO issue_date
+    FROM Borrower
+    WHERE Rollin = r_no
+    AND NameofBook = b_name;
+
+    no_of_days := SYSDATE - issue_date;
+
+    IF no_of_days BETWEEN 15 AND 30 THEN
+
+        fine_amt := no_of_days * 5;
+
+    ELSIF no_of_days > 30 THEN
+
+        fine_amt := (30 * 5) + ((no_of_days - 30) * 50);
+
+    END IF;
+
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Rollin = r_no
+    AND NameofBook = b_name;
+
+    IF fine_amt > 0 THEN
+
+        INSERT INTO Fine
+        VALUES(r_no, SYSDATE, fine_amt);
+
+    END IF;
+
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('Book Returned Successfully');
+    DBMS_OUTPUT.PUT_LINE('Fine Amount = ' || fine_amt);
+
+END;
+/
+
+
+
+
+SELECT * FROM Fine;
+
+

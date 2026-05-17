@@ -1,0 +1,226 @@
+10  
+Design MongoDB database and perform following Map reduce operation:  Create Employee collection by considering following Fields:  
+	i. Name: Embedded Doc (FName, LName)  
+	ii. Company Name: String  
+	iii. Salary: Number  
+	iv. Designation: String  
+	v. Age: Number  
+	vi. Expertise: Array  
+	vii. DOB: String or Date  
+	viii. Email id: String  
+	ix. Contact: String  
+	x. Address: Array of Embedded Doc (PAddr, LAddr)  
+Execute the following query:  
+	1. Display the total salary of per company  
+	2. Display the total salary of company Name:"TCS"  
+	3. Return the average salary of company whose address is “Pune".  
+	4. Display total count for “City=Pune”  
+	5. Return count for city pune and age greater than 40.  
+
+
+
+
+==================================================================================================================================================================================================
+
+use companyDB
+
+
+db.Employee.insertMany([
+{
+    Name: {FName: "Rahul", LName: "Sharma"},
+    Company_name: "TCS",
+    Salary: 50000,
+    Designation: "Developer",
+    Age: 28,
+    Expertise: ["MongoDB","MySQL"],
+    DOB: "1998-05-10",
+    Email_id: "rahul@gmail.com",
+    Contact: "9876543210",
+    Address: {
+        PAddr: "Pune",
+        LAddr: "Mumbai"
+    }
+},
+
+{
+    Name: {FName: "Priya", LName: "Patil"},
+    Company_name: "Infosys",
+    Salary: 60000,
+    Designation: "Tester",
+    Age: 35,
+    Expertise: ["Java","Cassandra"],
+    DOB: "1991-02-15",
+    Email_id: "priya@gmail.com",
+    Contact: "9988776655",
+    Address: {
+        PAddr: "Pune",
+        LAddr: "Nagpur"
+    }
+},
+
+{
+    Name: {FName: "Amit", LName: "Verma"},
+    Company_name: "TCS",
+    Salary: 70000,
+    Designation: "Manager",
+    Age: 45,
+    Expertise: ["Python","MongoDB"],
+    DOB: "1981-07-20",
+    Email_id: "amit@gmail.com",
+    Contact: "9090909090",
+    Address: {
+        PAddr: "Delhi",
+        LAddr: "Pune"
+    }
+},
+
+{
+    Name: {FName: "Sneha", LName: "Kulkarni"},
+    Company_name: "Wipro",
+    Salary: 55000,
+    Designation: "Developer",
+    Age: 42,
+    Expertise: ["MySQL","Cassandra"],
+    DOB: "1984-11-11",
+    Email_id: "sneha@gmail.com",
+    Contact: "9123456789",
+    Address: {
+        PAddr: "Pune",
+        LAddr: "Nashik"
+    }
+},
+
+{
+    Name: {FName: "Karan", LName: "Joshi"},
+    Company_name: "Infosys",
+    Salary: 65000,
+    Designation: "Programmer",
+    Age: 29,
+    Expertise: ["MongoDB","MySQL","Cassandra"],
+    DOB: "1997-03-18",
+    Email_id: "karan@gmail.com",
+    Contact: "9871234567",
+    Address: {
+        PAddr: "Aurangabad",
+        LAddr: "Pune"
+    }
+}
+])
+
+---------------------------------------------
+
+var mapFunction = function() {
+    emit(this.Company_name, this.Salary);
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: "TotalSalaryPerCompany" }
+)
+
+db.TotalSalaryPerCompany.find()
+
+
+
+var mapFunction = function() {
+    if(this.Company_name == "TCS") {
+        emit(this.Company_name, this.Salary);
+    }
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: "TCSSalary" }
+)
+
+db.TCSSalary.find()
+
+
+
+
+var mapFunction = function() {
+    if(this.Address.PAddr == "Pune") {
+        emit(this.Company_name, {
+            total: this.Salary,
+            count: 1
+        });
+    }
+};
+
+var reduceFunction = function(key, values) {
+    var result = {total: 0, count: 0};
+
+    values.forEach(function(v) {
+        result.total += v.total;
+        result.count += v.count;
+    });
+
+    return result;
+};
+
+var finalizeFunction = function(key, reducedValue) {
+    return reducedValue.total / reducedValue.count;
+};
+
+db.Employee.mapReduce(
+    mapFunction,
+    reduceFunction,
+    {
+        out: "AverageSalaryPune",
+        finalize: finalizeFunction
+    }
+)
+
+db.AverageSalaryPune.find()
+
+
+
+
+var mapFunction = function() {
+    if(this.Address.PAddr == "Pune") {
+        emit("Pune", 1);
+    }
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: "PuneCount" }
+)
+
+db.PuneCount.find()
+
+
+
+
+var mapFunction = function() {
+    if(this.Address.PAddr == "Pune" && this.Age > 40) {
+        emit("Pune_Age_Greater_40", 1);
+    }
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+db.Employee.mapReduce(
+    mapFunction,
+    reduceFunction,
+    { out: "PuneAgeCount" }
+)
+
+db.PuneAgeCount.find()

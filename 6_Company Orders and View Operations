@@ -1,0 +1,115 @@
+6  
+Consider following Relation: 
+	Companies(comp_id, name, cost, year) 
+	Orders(comp_id, domain, quantity) 
+Execute the following query:  
+	1. Find names, costs, domains and quantities for companies using inner join.  
+	2. Find Names costs, domains and quantities for companies using left outer join. 
+	3. Find Names costs, domains and quantities for companies using right outer join. 
+	4. Find Names costs, domains and quantities for companies using Union Operator 
+	5. Create View View1 by selecting both tables to show company name and quantities  	 		
+	6. Create View View2 by selecting any two columns and perform insert update delete operations.  
+	7. Display content of View1, View2.  
+
+
+
+
+==================================================================================================================================================================================================
+CREATE DATABASE Practical;
+USE Practical;
+
+
+
+CREATE TABLE Companies (
+    comp_id INT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    cost DECIMAL(10,2),
+    year INT
+);
+
+CREATE TABLE Orders (
+    comp_id INT,
+    domain VARCHAR(50),
+    quantity INT CHECK(quantity > 0),
+    FOREIGN KEY (comp_id)
+        REFERENCES Companies(comp_id)
+);
+
+
+INSERT INTO Companies VALUES
+(1,'TCS',50000,2020),
+(2,'InfoSys',70000,2021),
+(3,'Wipro',60000,2019),
+(4,'TechM',55000,2022);
+
+INSERT INTO Orders VALUES
+(1,'Software',10),
+(2,'Networking',15),
+(3,'Cloud',8),
+(4,'Security',20);
+
+
+SELECT Companies.name,
+       Companies.cost,
+       Orders.domain,
+       Orders.quantity
+FROM Companies
+INNER JOIN Orders
+ON Companies.comp_id = Orders.comp_id;
+
+
+SELECT Companies.name,
+       Companies.cost,
+       Orders.domain,
+       Orders.quantity
+FROM Companies
+LEFT JOIN Orders
+ON Companies.comp_id = Orders.comp_id;
+
+
+SELECT Companies.name,
+       Companies.cost,
+       Orders.domain,
+       Orders.quantity
+FROM Companies
+RIGHT JOIN Orders
+ON Companies.comp_id = Orders.comp_id;
+
+
+SELECT Companies.name,
+       Companies.cost,
+       Orders.domain,
+       Orders.quantity
+FROM Companies
+RIGHT JOIN Orders
+ON Companies.comp_id = Orders.comp_id;
+
+
+CREATE VIEW View1 AS
+SELECT Companies.name,
+       Orders.quantity
+FROM Companies
+INNER JOIN Orders
+ON Companies.comp_id = Orders.comp_id;
+
+
+CREATE VIEW View2 AS
+SELECT comp_id, name
+FROM Companies;
+
+
+INSERT INTO View2
+VALUES (5,'Oracle');
+
+
+UPDATE View2
+SET name = 'IBM'
+WHERE comp_id = 5;
+
+
+DELETE FROM View2
+WHERE comp_id = 5;
+
+
+SELECT * FROM View1;
+SELECT * FROM View2;

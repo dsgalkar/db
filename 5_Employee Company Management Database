@@ -1,0 +1,85 @@
+5  
+Consider following Relation  
+	Employee(emp_id,employee_name,street,city) 
+	Works(employee_name,company_name,salary)  
+	Company(company_name,city)  
+	Manages(employee_name,manager_name)  
+Create above tables with appropriate constraints like primary key, foreign key, not null etc.  
+1. Find the names of all employees who work for „TCS‟.  
+2. Find the names and company names of all employees sorted in ascending order of company name and descending order of employee names of that company.  
+3. Change the city of employee working with InfoSys to „Bangalore‟  
+4. Find the names, street address, and cities of residence for all employees who work for 'TechM' and earn more than $10,000.  
+5. Add Column Asset to Company table.  
+
+
+
+
+==================================================================================================================================================================================================
+CREATE DATABASE Practical;
+USE Practical;
+
+
+CREATE TABLE Employee (
+    emp_id INT PRIMARY KEY,
+    employee_name VARCHAR(50) NOT NULL,
+    street VARCHAR(50),
+    city VARCHAR(50)
+);
+
+CREATE TABLE Company (
+    company_name VARCHAR(50) PRIMARY KEY,
+    city VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Works (
+    employee_name VARCHAR(50),
+    company_name VARCHAR(50),
+    salary DECIMAL(10,2) CHECK(salary > 0),
+    PRIMARY KEY (employee_name, company_name),
+    FOREIGN KEY (company_name)
+        REFERENCES Company(company_name)
+);
+
+CREATE TABLE Manages (
+    employee_name VARCHAR(50),
+    manager_name VARCHAR(50),
+    PRIMARY KEY (employee_name),
+    FOREIGN KEY (employee_name)
+        REFERENCES Employee(employee_name)
+);
+
+
+SELECT employee_name
+FROM Works
+WHERE company_name = 'TCS';
+
+
+
+SELECT employee_name, company_name
+FROM Works
+ORDER BY company_name ASC,
+         employee_name DESC;
+
+UPDATE Employee
+SET city = 'Bangalore'
+WHERE employee_name IN
+(
+    SELECT employee_name
+    FROM Works
+    WHERE company_name = 'InfoSys'
+);
+
+
+SELECT Employee.employee_name,
+       Employee.street,
+       Employee.city
+FROM Employee
+INNER JOIN Works
+ON Employee.employee_name = Works.employee_name
+WHERE Works.company_name = 'TechM'
+AND Works.salary > 10000;
+
+
+
+ALTER TABLE Company
+ADD Asset DECIMAL(12,2);

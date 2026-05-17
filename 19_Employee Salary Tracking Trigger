@@ -1,0 +1,92 @@
+19   
+Trigger :Write a after trigger for Insert, update and delete event considering following requirement:  
+	Emp(Emp_no, Emp_name, Emp_salary)  
+a) Trigger should be initiated when salary tried to be inserted is less than Rs.50,000/- 
+b) Trigger should be initiated when salary tried to be updated for value less than Rs. 50,000/- Also the new values expected to be inserted will be stored in new  
+table Tracking(Emp_no,Emp_salary).
+
+
+
+
+==================================================================================================================================================================================================
+
+CREATE TABLE Emp (
+    Emp_no NUMBER PRIMARY KEY,
+    Emp_name VARCHAR2(50),
+    Emp_salary NUMBER(10,2)
+);
+
+
+
+CREATE TABLE Tracking (
+    Emp_no NUMBER,
+    Emp_salary NUMBER(10,2)
+);
+
+
+
+CREATE OR REPLACE TRIGGER emp_salary_trigger
+AFTER INSERT OR UPDATE OR DELETE
+ON Emp
+FOR EACH ROW
+
+BEGIN
+
+    IF INSERTING THEN
+
+        IF :NEW.Emp_salary < 50000 THEN
+
+            INSERT INTO Tracking
+            VALUES(:NEW.Emp_no, :NEW.Emp_salary);
+
+            DBMS_OUTPUT.PUT_LINE(
+                'Inserted salary less than 50000'
+            );
+
+        END IF;
+
+    ELSIF UPDATING THEN
+
+        IF :NEW.Emp_salary < 50000 THEN
+
+            INSERT INTO Tracking
+            VALUES(:NEW.Emp_no, :NEW.Emp_salary);
+
+            DBMS_OUTPUT.PUT_LINE(
+                'Updated salary less than 50000'
+            );
+
+        END IF;
+
+    ELSIF DELETING THEN
+
+        DBMS_OUTPUT.PUT_LINE(
+            'Employee record deleted'
+        );
+
+    END IF;
+
+END;
+/
+
+
+
+INSERT INTO Emp
+VALUES (101,'Rahul',45000);
+
+INSERT INTO Emp
+VALUES (102,'Amit',60000);
+
+
+
+UPDATE Emp
+SET Emp_salary = 40000
+WHERE Emp_no = 102;
+
+
+
+DELETE FROM Emp
+WHERE Emp_no = 101;
+
+
+SELECT * FROM Tracking;

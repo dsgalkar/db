@@ -1,0 +1,66 @@
+16  
+Create a stored function titled 'Age_calc'.  
+Accept the date of birth of a person as a parameter.  
+Calculate the age of the person in years, months and days e.g. 3 years, 2months, 10 days.  
+Return the age in years directly (with the help of Return statement).  
+The months and days are to be returned indirectly in the form of  OUT parameters.  
+
+
+
+
+==================================================================================================================================================================================================
+
+CREATE OR REPLACE FUNCTION Age_calc
+(
+    dob IN DATE,
+    months OUT NUMBER,
+    days OUT NUMBER
+)
+RETURN NUMBER
+
+IS
+
+    years NUMBER;
+
+BEGIN
+
+    years := FLOOR(MONTHS_BETWEEN(SYSDATE, dob) / 12);
+
+    months := FLOOR(MOD(MONTHS_BETWEEN(SYSDATE, dob), 12));
+
+    days := FLOOR(SYSDATE -
+           ADD_MONTHS(dob, years * 12 + months));
+
+    RETURN years;
+
+END;
+/
+
+
+
+DECLARE
+
+    y NUMBER;
+    m NUMBER;
+    d NUMBER;
+
+BEGIN
+
+    y := Age_calc(
+            TO_DATE('08-12-2004','DD-MM-YYYY'),
+            m,
+            d
+         );
+
+    DBMS_OUTPUT.PUT_LINE('Age = '
+        || y || ' Years '
+        || m || ' Months '
+        || d || ' Days');
+
+END;
+/
+
+
+
+
+

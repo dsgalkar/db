@@ -1,0 +1,87 @@
+15  
+Write a PL/SQL Block to increase the salary of employees by 10% of existing salary, who are having salary less than average salary of organization, whenever such salary updates takes place, a record for same is maintained in the increment_salary table.       
+	emp(emp_no, salary)             
+	increment_salary(emp_no, salary) 
+
+
+
+
+==================================================================================================================================================================================================
+
+
+CREATE TABLE emp (
+    emp_no NUMBER PRIMARY KEY,
+    salary NUMBER(10,2)
+);
+
+CREATE TABLE increment_salary (
+    emp_no NUMBER,
+    salary NUMBER(10,2)
+);
+
+
+
+INSERT INTO emp VALUES (101,20000);
+INSERT INTO emp VALUES (102,30000);
+INSERT INTO emp VALUES (103,25000);
+INSERT INTO emp VALUES (104,50000);
+
+
+
+DECLARE
+
+    avg_salary NUMBER(10,2);
+
+    CURSOR c1 IS
+        SELECT emp_no, salary
+        FROM emp
+        WHERE salary <
+        (
+            SELECT AVG(salary)
+            FROM emp
+        );
+
+    v_empno emp.emp_no%TYPE;
+    v_salary emp.salary%TYPE;
+    new_salary NUMBER(10,2);
+
+BEGIN
+
+    SELECT AVG(salary)
+    INTO avg_salary
+    FROM emp;
+
+    OPEN c1;
+
+    LOOP
+
+        FETCH c1 INTO v_empno, v_salary;
+
+        EXIT WHEN c1%NOTFOUND;
+
+        new_salary := v_salary + (v_salary * 0.10);
+
+        UPDATE emp
+        SET salary = new_salary
+        WHERE emp_no = v_empno;
+
+        INSERT INTO increment_salary
+        VALUES(v_empno, new_salary);
+
+    END LOOP;
+
+    CLOSE c1;
+
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('Salary Updated Successfully');
+
+END;
+/
+
+
+
+SELECT * FROM emp;
+
+
+SELECT * FROM increment_salary;

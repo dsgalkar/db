@@ -1,0 +1,103 @@
+2.  
+Consider following Relation   
+	Account(Acc_no, branch_name,balance)    
+	Branch(branch_name,branch_city,assets)   
+	Customer(cust_name,cust_street,cust_city)   
+	Depositor(cust_name,acc_no)    
+	Loan(loan_no,branch_name,amount)    
+	Borrower(cust_name,loan_no) 
+Create above tables with appropriate constraints like primary key, foreign key, not null etc. 
+1. Find all customers who have both account and loan at bank. 
+2. Find all customers who have an account or loan or both at bank. 
+3. Find all customers who have account but no loan at the bank. 
+4. Find average account balance at „Wadia College‟ branch. 
+5. Find no. of depositors at each branch
+
+
+
+
+==================================================================================================================================================================================================
+
+CREATE TABLE Branch (
+    branch_name VARCHAR(50) PRIMARY KEY,
+    branch_city VARCHAR(50) NOT NULL,
+    assets DECIMAL(12,2)
+);
+
+CREATE TABLE Account (
+    acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    balance DECIMAL(12,2) CHECK(balance >= 0),
+    FOREIGN KEY (branch_name)
+        REFERENCES Branch(branch_name)
+);
+
+CREATE TABLE Customer (
+    cust_name VARCHAR(50) PRIMARY KEY,
+    cust_street VARCHAR(50),
+    cust_city VARCHAR(50)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(50),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    FOREIGN KEY (cust_name)
+        REFERENCES Customer(cust_name),
+    FOREIGN KEY (acc_no)
+        REFERENCES Account(acc_no)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    amount DECIMAL(12,2) CHECK(amount > 0),
+    FOREIGN KEY (branch_name)
+        REFERENCES Branch(branch_name)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(50),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    FOREIGN KEY (cust_name)
+        REFERENCES Customer(cust_name),
+    FOREIGN KEY (loan_no)
+        REFERENCES Loan(loan_no)
+);
+
+---------------------------------------
+CREATE DATABASE Practical;
+USE Practical;
+
+SELECT DISTINCT Depositor.cust_name
+FROM Depositor
+INNER JOIN Borrower
+ON Depositor.cust_name = Borrower.cust_name;
+
+
+SELECT cust_name FROM Depositor
+UNION
+SELECT cust_name FROM Borrower;
+
+
+SELECT cust_name
+FROM Depositor
+WHERE cust_name NOT IN
+(
+    SELECT cust_name
+    FROM Borrower
+);
+
+
+SELECT AVG(balance) AS Average_Balance
+FROM Account
+WHERE branch_name = 'Wadia College';
+
+
+SELECT Account.branch_name,
+       COUNT(Depositor.cust_name) AS No_Of_Depositors
+FROM Account
+INNER JOIN Depositor
+ON Account.acc_no = Depositor.acc_no
+GROUP BY Account.branch_name;

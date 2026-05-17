@@ -1,0 +1,102 @@
+3 
+Consider following Relation 
+	Account(Acc_no, branch_name,balance) 
+	Branch(branch_name,branch_city,assets) 
+	Customer(cust_name,cust_street,cust_city) 
+	Depositor(cust_name,acc_no) 
+	Loan(loan_no,branch_name,amount) 
+	Borrower(cust_name,loan_no) 
+Create above tables with appropriate constraints like primary key, foreign key, not null etc. 
+1. Find the branches where average account balance > 15000. 
+2. Find number of tuples in customer relation. 
+3. Calculate total loan amount given by bank. 
+4. Delete all loans with loan amount between 1300 and 1500. 
+5. Find the average account balance at each branch 
+6. Find name of Customer and city where customer name starts with Letter P. 
+
+
+
+
+==================================================================================================================================================================================================
+CREATE DATABASE Practical;
+USE Practical;
+
+CREATE TABLE Branch (
+    branch_name VARCHAR(50) PRIMARY KEY,
+    branch_city VARCHAR(50) NOT NULL,
+    assets DECIMAL(12,2)
+);
+
+CREATE TABLE Account (
+    acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    balance DECIMAL(12,2) CHECK(balance >= 0),
+    FOREIGN KEY (branch_name)
+        REFERENCES Branch(branch_name)
+);
+
+CREATE TABLE Customer (
+    cust_name VARCHAR(50) PRIMARY KEY,
+    cust_street VARCHAR(50),
+    cust_city VARCHAR(50)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(50),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    FOREIGN KEY (cust_name)
+        REFERENCES Customer(cust_name),
+    FOREIGN KEY (acc_no)
+        REFERENCES Account(acc_no)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(50),
+    amount DECIMAL(12,2) CHECK(amount > 0),
+    FOREIGN KEY (branch_name)
+        REFERENCES Branch(branch_name)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(50),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    FOREIGN KEY (cust_name)
+        REFERENCES Customer(cust_name),
+    FOREIGN KEY (loan_no)
+        REFERENCES Loan(loan_no)
+);
+
+
+
+--------------------------------------------------
+
+
+SELECT branch_name, AVG(balance) AS Average_Balance
+FROM Account
+GROUP BY branch_name
+HAVING AVG(balance) > 15000;
+
+
+SELECT COUNT(*) AS Total_Customers
+FROM Customer;
+
+SELECT SUM(amount) AS Total_Loan_Amount
+FROM Loan;
+
+
+DELETE FROM Loan
+WHERE amount BETWEEN 1300 AND 1500;
+
+
+SELECT branch_name,
+       AVG(balance) AS Average_Balance
+FROM Account
+GROUP BY branch_name;
+
+
+SELECT cust_name, cust_city
+FROM Customer
+WHERE cust_name LIKE 'P%';
