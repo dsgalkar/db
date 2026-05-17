@@ -67,24 +67,6 @@ LEFT JOIN Orders
 ON Companies.comp_id = Orders.comp_id;
 
 
-SELECT Companies.name,
-       Companies.cost,
-       Orders.domain,
-       Orders.quantity
-FROM Companies
-RIGHT JOIN Orders
-ON Companies.comp_id = Orders.comp_id;
-
-
-SELECT Companies.name,
-       Companies.cost,
-       Orders.domain,
-       Orders.quantity
-FROM Companies
-RIGHT JOIN Orders
-ON Companies.comp_id = Orders.comp_id;
-
-
 CREATE VIEW View1 AS
 SELECT Companies.name,
        Orders.quantity

@@ -27,6 +27,10 @@ CREATE TABLE Branch (
     assets DECIMAL(12,2)
 );
 
+INSERT INTO Branch VALUES
+('Main Branch','Pune',800000),
+('City Branch','Mumbai',950000);
+
 CREATE TABLE Account (
     acc_no INT PRIMARY KEY,
     branch_name VARCHAR(50),
@@ -35,11 +39,23 @@ CREATE TABLE Account (
         REFERENCES Branch(branch_name)
 );
 
+INSERT INTO Account VALUES
+(121,'Main Branch',10000),
+(122,'Main Branch',25000),
+(123,'City Branch',30000),
+(124,'City Branch',15000);
+
 CREATE TABLE Customer (
     cust_name VARCHAR(50) PRIMARY KEY,
     cust_street VARCHAR(50),
     cust_city VARCHAR(50)
 );
+
+INSERT INTO Customer VALUES
+('Pratik','Alandi','Pune'),
+('Pallavi','Baner','Pune'),
+('Ajay','Dadar','Mumbai'),
+('Priti','Kalyan','Mumbai');
 
 CREATE TABLE Depositor (
     cust_name VARCHAR(50),
@@ -51,6 +67,12 @@ CREATE TABLE Depositor (
         REFERENCES Account(acc_no)
 );
 
+INSERT INTO Depositor VALUES
+('Pratik',121),
+('Pallavi',122),
+('Ajay',123),
+('Priti',124);
+
 CREATE TABLE Loan (
     loan_no INT PRIMARY KEY,
     branch_name VARCHAR(50),
@@ -58,6 +80,11 @@ CREATE TABLE Loan (
     FOREIGN KEY (branch_name)
         REFERENCES Branch(branch_name)
 );
+
+INSERT INTO Loan VALUES
+(401,'Main Branch',1400),
+(402,'City Branch',5000),
+(403,'Main Branch',20000);
 
 CREATE TABLE Borrower (
     cust_name VARCHAR(50),

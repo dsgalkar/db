@@ -28,6 +28,11 @@ CREATE TABLE Branch (
     asset DECIMAL(12,2)
 );
 
+INSERT INTO Branch VALUES
+('Wadia College','Pune',500000),
+('FC Road','Pune',700000),
+('Shivaji Nagar','Mumbai',800000);
+
 CREATE TABLE Account (
     acc_no INT PRIMARY KEY,
     branch_name VARCHAR(50),
@@ -36,11 +41,23 @@ CREATE TABLE Account (
         REFERENCES Branch(branch_name)
 );
 
+INSERT INTO Account VALUES
+(101,'Wadia College',15000),
+(102,'FC Road',22000),
+(103,'Shivaji Nagar',18000),
+(104,'Wadia College',25000);
+
 CREATE TABLE Customer (
     cust_name VARCHAR(50) PRIMARY KEY,
     cust_street VARCHAR(50),
     cust_city VARCHAR(50)
 );
+
+INSERT INTO Customer VALUES
+('Rahul','MG Road','Pune'),
+('Sneha','JM Road','Pune'),
+('Amit','Andheri','Mumbai'),
+('Priya','Camp','Pune');
 
 CREATE TABLE Depositor (
     cust_name VARCHAR(50),
@@ -52,6 +69,12 @@ CREATE TABLE Depositor (
         REFERENCES Account(acc_no)
 );
 
+INSERT INTO Depositor VALUES
+('Rahul',101),
+('Sneha',102),
+('Amit',103),
+('Priya',104);
+
 CREATE TABLE Loan (
     loan_no INT PRIMARY KEY,
     branch_name VARCHAR(50),
@@ -59,6 +82,11 @@ CREATE TABLE Loan (
     FOREIGN KEY (branch_name)
         REFERENCES Branch(branch_name)
 );
+
+INSERT INTO Loan VALUES
+(201,'Wadia College',15000),
+(202,'FC Road',10000),
+(203,'Shivaji Nagar',25000);
 
 CREATE TABLE Borrower (
     cust_name VARCHAR(50),
@@ -69,6 +97,11 @@ CREATE TABLE Borrower (
     FOREIGN KEY (loan_no)
         REFERENCES Loan(loan_no)
 );
+
+INSERT INTO Borrower VALUES
+('Rahul',201),
+('Sneha',202),
+('Amit',203);
 
 -----------------------------------------
 

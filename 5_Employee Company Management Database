@@ -26,10 +26,20 @@ CREATE TABLE Employee (
     city VARCHAR(50)
 );
 
+INSERT INTO Employee VALUES
+(1,'Rahul','MG Road','Pune'),
+(2,'Sneha','JM Road','Mumbai'),
+(3,'Amit','FC Road','Pune');
+
 CREATE TABLE Company (
     company_name VARCHAR(50) PRIMARY KEY,
     city VARCHAR(50) NOT NULL
 );
+
+INSERT INTO Company VALUES
+('TCS','Mumbai'),
+('InfoSys','Bangalore'),
+('TechM','Pune');
 
 CREATE TABLE Works (
     employee_name VARCHAR(50),
@@ -40,6 +50,11 @@ CREATE TABLE Works (
         REFERENCES Company(company_name)
 );
 
+INSERT INTO Works VALUES
+('Rahul','TCS',25000),
+('Sneha','InfoSys',18000),
+('Amit','TechM',12000);
+
 CREATE TABLE Manages (
     employee_name VARCHAR(50),
     manager_name VARCHAR(50),
@@ -47,6 +62,10 @@ CREATE TABLE Manages (
     FOREIGN KEY (employee_name)
         REFERENCES Employee(employee_name)
 );
+
+INSERT INTO Manages VALUES
+('Rahul','Amit'),
+('Sneha','Rahul');
 
 
 SELECT employee_name
